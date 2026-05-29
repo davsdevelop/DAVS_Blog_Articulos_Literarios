@@ -1,0 +1,13 @@
+{% extends 'pages/base.html' %}
+
+{% block content %}
+    <h2>Enviar Mensaje Directo</h2>
+    <p>Selecciona a un usuario de la plataforma y escríbele un mensaje.</p>
+    
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Enviar</button>
+        <a href="{% url 'bandeja_entrada' %}" class="btn btn-danger" style="text-decoration: none;">Cancelar</a>
+    </form>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'pages/base.html' %}
+
+{% block content %}
+    <h2>Páginas Publicadas</h2>
+    
+    <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+        <a href="{% url 'post_create' %}" class="btn">➕ Crear Nueva Página</a>
+        
+        <form method="GET" style="display: flex; gap: 10px;">
+            <input type="text" name="q" placeholder="Buscar por título..." value="{{ request.GET.q }}" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; min-width: 250px;">
+            <button type="submit" class="btn">🔍 Buscar</button>
+            
+            {% if request.GET.q %}
+                <a href="{% url 'post_list' %}" class="btn btn-danger" style="text-decoration: none;">Limpiar</a>
+            {% endif %}
+        </form>
+    </div>
+
+    {% if posts %}
+        {% for post in posts %}
+            <div class="post-card">
+                <h3>{{ post.titulo }}</h3>
+                <p><em>{{ post.subtitulo }}</em> - Autor: {{ post.autor.username }} | {{ post.fecha }}</p>
+                <a href="{% url 'post_detail' post.pk %}" class="btn">Leer más</a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p style="color: #e74c3c; font-weight: bold; font-size: 1.1em;">
+            {% if request.GET.q %}
+                No se encontraron páginas que coincidan con la búsqueda "{{ request.GET.q }}".
+            {% else %}
+                No hay páginas aún.
+            {% endif %}
+        </p>
+    {% endif %}
+{% endblock %}

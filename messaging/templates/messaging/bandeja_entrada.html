@@ -1,0 +1,22 @@
+{% extends 'pages/base.html' %}
+
+{% block content %}
+    <h2>Bandeja de Entrada</h2>
+    
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'enviar_mensaje' %}" class="btn">Redactar Nuevo Mensaje</a>
+    </div>
+
+    {% if mensajes %}
+        {% for mensaje in mensajes %}
+            <div class="post-card" style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #3498db; border-radius: 5px;">
+                <h3 style="margin-top: 0;">{{ mensaje.asunto }}</h3>
+                <p style="margin: 5px 0;"><strong>De:</strong> {{ mensaje.remitente.username }}</p>
+                <p style="font-size: 0.9em; color: gray;"><strong>Fecha:</strong> {{ mensaje.fecha_envio|date:"d M Y H:i" }}</p>
+                <a href="{% url 'leer_mensaje' mensaje.pk %}" class="btn" style="margin-top: 10px;">Leer Mensaje</a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p style="color: #7f8c8d; font-style: italic;">No tienes mensajes en tu bandeja de entrada en este momento.</p>
+    {% endif %}
+{% endblock %}

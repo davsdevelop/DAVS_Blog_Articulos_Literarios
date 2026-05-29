@@ -1,0 +1,12 @@
+{% extends 'pages/base.html' %}
+
+{% block content %}
+    <h2>Crear una Cuenta</h2>
+    <p>Únete a nuestro portal de artículos literarios.</p>
+    
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Registrarme</button>
+    </form>
+{% endblock %}

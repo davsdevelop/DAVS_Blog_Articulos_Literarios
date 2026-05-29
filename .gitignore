@@ -1,0 +1,24 @@
+# Ambientes Virtuales
+venv/
+.venv/
+env/
+
+# Archivos compilados de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Base de datos local
+db.sqlite3
+
+# Archivos del sistema
+.DS_Store
+.AppleDouble
+
+# Archivos multimedia subidos (puedes ajustarlo si cambias la carpeta MEDIA_ROOT)
+media/
+staticfiles/
+
+# Archivos de configuración local
+.env
+.env.*

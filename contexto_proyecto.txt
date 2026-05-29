@@ -1,0 +1,1444 @@
+
+==================================================
+ARCHIVO: ./.DS_Store
+==================================================
+[Archivo no legible como texto plano]
+
+==================================================
+ARCHIVO: ./requirements.txt
+==================================================
+asgiref==3.11.1
+Django==6.0.4
+django-ckeditor==6.7.3
+django-js-asset==3.1.2
+pillow==12.2.0
+sqlparse==0.5.5
+
+
+==================================================
+ARCHIVO: ./empaquetar1.py
+==================================================
+import os
+
+def consolidar_proyecto(directorio, archivo_salida):
+    # Carpetas estándar a ignorar en proyectos Reflex y Python
+    ignorar_carpetas = [
+        '.git', 'venv', '.venv', '__pycache__', 
+        '.web', '.states', 'node_modules', '.reflex',
+        'build', 'dist'
+    ]
+    
+    # Extensiones de archivos binarios o irrelevantes para el contexto
+    ignorar_extensiones = [
+        '.pyc', '.sqlite3', '.db', '.whl', '.pkl',
+        '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.webp',
+        '.pdf', '.zip', '.tar', '.gz', '.log'
+    ]
+
+    with open(archivo_salida, 'w', encoding='utf-8') as f_out:
+        for raiz, directorios, archivos in os.walk(directorio):
+            # Filtramos las carpetas a ignorar
+            directorios[:] = [d for d in directorios if d not in ignorar_carpetas]
+            
+            for archivo in archivos:
+                # Ignorar extensiones, el propio script y el archivo de salida
+                if (any(archivo.lower().endswith(ext) for ext in ignorar_extensiones) or 
+                    archivo == 'empaquetar.py' or 
+                    archivo == archivo_salida):
+                    continue
+                
+                ruta_completa = os.path.join(raiz, archivo)
+                
+                # Agregamos separadores claros
+                f_out.write(f"\n{'='*50}\n")
+                f_out.write(f"ARCHIVO: {ruta_completa}\n")
+                f_out.write(f"{'='*50}\n")
+                
+                try:
+                    with open(ruta_completa, 'r', encoding='utf-8') as f_in:
+                        f_out.write(f_in.read() + "\n")
+                except Exception:
+                    f_out.write(f"[Archivo no legible como texto plano]\n")
+
+if __name__ == '__main__':
+    nombre_salida = 'contexto_proyecto.txt'
+    consolidar_proyecto('.', nombre_salida)
+    print(f"¡Archivo {nombre_salida} generado con éxito!")
+
+==================================================
+ARCHIVO: ./README.md
+==================================================
+# Portal Literario - Proyecto Final Django
+
+Plataforma web tipo Blog desarrollada con el framework **Django**. Este proyecto integra gestión de contenido profesional con funcionalidades sociales entre usuarios.
+
+## 🚀 Arquitectura Técnica
+* **Patrón MVT**: Estructura modular que separa la lógica (Views), los datos (Models) y la interfaz (Templates).
+* [cite_start]**Gestión de Contenido**: Implementación de **CKEditor** para edición de texto enriquecido en artículos literarios[cite: 12].
+* [cite_start]**Autenticación y Perfiles**: Sistema de registro y login con perfiles de usuario personalizados, incluyendo avatares y biografías[cite: 9, 10, 31].
+* [cite_start]**Mensajería Interna**: Sistema de comunicación privada entre miembros registrados de la plataforma[cite: 13, 85].
+* [cite_start]**Diseño Responsivo**: Interfaz moderna basada en CSS Flexbox y variables de estilo nativas[cite: 61, 72].
+
+## 🛠️ Stack Tecnológico
+* [cite_start]**Framework**: Django 6.0 
+* [cite_start]**Base de Datos**: SQLite3 
+* **Frontend**: HTML5, CSS3 Nativo
+* [cite_start]**Librerías clave**: Pillow (imágenes), CKEditor (texto enriquecido) 
+
+## ⚙️ Configuración Local
+1. Clonar el repositorio.
+2. [cite_start]Crear entorno virtual: `python -m venv venv` [cite: 19]
+3. [cite_start]Instalar dependencias: `pip install -r requirements.txt` [cite: 20]
+4. [cite_start]Realizar migraciones: `python manage.py migrate` [cite: 20]
+5. Crear superusuario: `python manage.py createsuperuser`
+6. [cite_start]Iniciar servidor: `python manage.py runserver` [cite: 20]
+
+==================================================
+ARCHIVO: ./.gitignore
+==================================================
+# Ambientes Virtuales
+venv/
+.venv/
+env/
+
+# Archivos compilados de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Base de datos local
+db.sqlite3
+
+# Archivos del sistema
+.DS_Store
+.AppleDouble
+
+# Archivos multimedia subidos (puedes ajustarlo si cambias la carpeta MEDIA_ROOT)
+media/
+staticfiles/
+
+# Archivos de configuración local
+.env
+.env.*
+
+==================================================
+ARCHIVO: ./manage.py
+==================================================
+#!/usr/bin/env python
+"""Django's command-line utility for administrative tasks."""
+import os
+import sys
+
+
+def main():
+    """Run administrative tasks."""
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'blog_project.settings')
+    try:
+        from django.core.management import execute_from_command_line
+    except ImportError as exc:
+        raise ImportError(
+            "Couldn't import Django. Are you sure it's installed and "
+            "available on your PYTHONPATH environment variable? Did you "
+            "forget to activate a virtual environment?"
+        ) from exc
+    execute_from_command_line(sys.argv)
+
+
+if __name__ == '__main__':
+    main()
+
+
+==================================================
+ARCHIVO: ./blog_project/.DS_Store
+==================================================
+[Archivo no legible como texto plano]
+
+==================================================
+ARCHIVO: ./blog_project/asgi.py
+==================================================
+"""
+ASGI config for blog_project project.
+
+It exposes the ASGI callable as a module-level variable named ``application``.
+
+For more information on this file, see
+https://docs.djangoproject.com/en/6.0/howto/deployment/asgi/
+"""
+
+import os
+
+from django.core.asgi import get_asgi_application
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'blog_project.settings')
+
+application = get_asgi_application()
+
+
+==================================================
+ARCHIVO: ./blog_project/__init__.py
+==================================================
+
+
+==================================================
+ARCHIVO: ./blog_project/settings.py
+==================================================
+"""
+Django settings for blog_project project.
+
+Generated by 'django-admin startproject' using Django 6.0.4.
+
+For more information on this file, see
+https://docs.djangoproject.com/en/6.0/topics/settings/
+
+For the full list of settings and their values, see
+https://docs.djangoproject.com/en/6.0/ref/settings/
+"""
+import os
+from pathlib import Path
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'django-insecure-xg8pzcnm@-+)_c!r^9@npp$8s3)o71g!nf#rag&9a%66qhx-=1'
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+ALLOWED_HOSTS = []
+
+
+# Application definition
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    # Aplicaciones de terceros
+    'ckeditor',
+    # Mis aplicaciones
+    'pages',
+    'accounts',
+    'messaging',
+]
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'blog_project.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'blog_project.wsgi.application'
+
+
+# Database
+# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+
+# Password validation
+# https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
+
+
+# Internationalization
+# https://docs.djangoproject.com/en/6.0/topics/i18n/
+
+LANGUAGE_CODE = 'es' # o 'es-cl' para español de Chile
+TIME_ZONE = 'America/Santiago'
+
+USE_I18N = True
+
+USE_TZ = True
+
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/6.0/howto/static-files/
+
+STATIC_URL = 'static/'
+
+# Configuración para archivos multimedia (imágenes subidas por usuarios)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+
+# Redirecciones de Autenticación
+LOGIN_REDIRECT_URL = 'home'  
+LOGIN_URL = 'login'          
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+==================================================
+ARCHIVO: ./blog_project/urls.py
+==================================================
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('pages.urls')), 
+    path('cuentas/', include('accounts.urls')),
+    path('mensajes/', include('messaging.urls')),
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+==================================================
+ARCHIVO: ./blog_project/wsgi.py
+==================================================
+"""
+WSGI config for blog_project project.
+
+It exposes the WSGI callable as a module-level variable named ``application``.
+
+For more information on this file, see
+https://docs.djangoproject.com/en/6.0/howto/deployment/wsgi/
+"""
+
+import os
+
+from django.core.wsgi import get_wsgi_application
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'blog_project.settings')
+
+application = get_wsgi_application()
+
+
+==================================================
+ARCHIVO: ./accounts/.DS_Store
+==================================================
+[Archivo no legible como texto plano]
+
+==================================================
+ARCHIVO: ./accounts/models.py
+==================================================
+from django.db import models
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+class Perfil(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    avatar = models.ImageField(upload_to='avatares/', null=True, blank=True)
+    biografia = models.TextField(null=True, blank=True)
+    enlace = models.URLField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Perfil de {self.user.username}"
+
+
+@receiver(post_save, sender=User)
+def crear_perfil(sender, instance, created, **kwargs):
+
+    if created:
+        Perfil.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def guardar_perfil(sender, instance, **kwargs):
+
+    try:
+        instance.perfil.save()
+    except Perfil.DoesNotExist:
+        Perfil.objects.create(user=instance)
+
+==================================================
+ARCHIVO: ./accounts/__init__.py
+==================================================
+
+
+==================================================
+ARCHIVO: ./accounts/apps.py
+==================================================
+from django.apps import AppConfig
+
+
+class AccountsConfig(AppConfig):
+    name = 'accounts'
+
+
+==================================================
+ARCHIVO: ./accounts/forms.py
+==================================================
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+from .models import Perfil
+
+# Formulario - Registro 
+class RegistroUsuarioForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+    
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'email']
+
+# Formulario - editar los datos básicos
+class EditarUsuarioForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']
+
+# Formulario - editar foto y biografía
+class EditarPerfilForm(forms.ModelForm):
+    class Meta:
+        model = Perfil
+        fields = ['avatar', 'biografia', 'enlace']
+
+==================================================
+ARCHIVO: ./accounts/admin.py
+==================================================
+from django.contrib import admin
+
+# Register your models here.
+
+
+==================================================
+ARCHIVO: ./accounts/tests.py
+==================================================
+from django.test import TestCase
+
+# Create your tests here.
+
+
+==================================================
+ARCHIVO: ./accounts/urls.py
+==================================================
+from django.urls import path
+from django.contrib.auth.views import LogoutView, PasswordChangeView, PasswordChangeDoneView
+from . import views
+
+urlpatterns = [
+    path('login/', views.CustomLoginView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(next_page='home'), name='logout'),
+    path('registro/', views.registro, name='registro'),
+    path('perfil/', views.perfil, name='perfil'),
+    path('perfil/editar/', views.editar_perfil, name='editar_perfil'),
+    path('password/', PasswordChangeView.as_view(template_name='accounts/cambiar_password.html', success_url='/cuentas/password/exito/'), name='cambiar_password'),
+    path('password/exito/', PasswordChangeDoneView.as_view(template_name='accounts/password_exito.html'), name='password_exito'),
+]
+
+==================================================
+ARCHIVO: ./accounts/views.py
+==================================================
+from django.shortcuts import render, redirect
+from django.contrib.auth.views import LoginView
+from django.contrib.auth.decorators import login_required
+from .forms import RegistroUsuarioForm, EditarUsuarioForm, EditarPerfilForm
+from .models import Perfil
+
+
+class CustomLoginView(LoginView):
+    template_name = 'accounts/login.html'
+
+# Vista de Registro
+def registro(request):
+    if request.method == 'POST':
+        form = RegistroUsuarioForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            return redirect('login')
+    else:
+        form = RegistroUsuarioForm()
+    
+    return render(request, 'accounts/registro.html', {'form': form})
+
+# Vista de Perfil 
+@login_required
+def perfil(request):
+    return render(request, 'accounts/perfil.html')
+
+# Vista para Editar el Perfil
+@login_required
+def editar_perfil(request):
+
+    perfil = request.user.perfil 
+    
+    if request.method == 'POST':
+        user_form = EditarUsuarioForm(request.POST, instance=request.user)
+        perfil_form = EditarPerfilForm(request.POST, request.FILES, instance=perfil)
+        
+        if user_form.is_valid() and perfil_form.is_valid():
+            user_form.save()
+            perfil_form.save()
+            return redirect('perfil')
+    else:
+        user_form = EditarUsuarioForm(instance=request.user)
+        perfil_form = EditarPerfilForm(instance=perfil)
+        
+    return render(request, 'accounts/editar_perfil.html', {
+        'user_form': user_form,
+        'perfil_form': perfil_form
+    })
+
+==================================================
+ARCHIVO: ./accounts/migrations/.DS_Store
+==================================================
+[Archivo no legible como texto plano]
+
+==================================================
+ARCHIVO: ./accounts/migrations/__init__.py
+==================================================
+
+
+==================================================
+ARCHIVO: ./accounts/migrations/0001_initial.py
+==================================================
+# Generated by Django 6.0.4 on 2026-05-29 17:54
+
+import django.db.models.deletion
+from django.conf import settings
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    initial = True
+
+    dependencies = [
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name='Perfil',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('avatar', models.ImageField(blank=True, null=True, upload_to='avatares/')),
+                ('biografia', models.TextField(blank=True, null=True)),
+                ('enlace', models.URLField(blank=True, null=True)),
+                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+            ],
+        ),
+    ]
+
+
+==================================================
+ARCHIVO: ./accounts/templates/accounts/registro.html
+==================================================
+{% extends 'pages/base.html' %}
+
+{% block content %}
+    <h2>Crear una Cuenta</h2>
+    <p>Únete a nuestro portal de artículos literarios.</p>
+    
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Registrarme</button>
+    </form>
+{% endblock %}
+
+==================================================
+ARCHIVO: ./accounts/templates/accounts/editar_perfil.html
+==================================================
+{% extends 'pages/base.html' %}
+
+{% block content %}
+    <h2>Editar Mi Perfil</h2>
+    
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <h4 style="border-bottom: 1px solid #ccc; padding-bottom: 5px;">Datos de Usuario</h4>
+        {{ user_form.as_p }}
+        
+        <h4 style="border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top: 20px;">Foto y Biografía</h4>
+        {{ perfil_form.as_p }}
+        
+        <br>
+        <button type="submit" class="btn">Guardar Cambios</button>
+        <a href="{% url 'perfil' %}" class="btn btn-danger" style="text-decoration: none;">Cancelar</a>
+    </form>
+{% endblock %}
+
+==================================================
+ARCHIVO: ./accounts/templates/accounts/login.html
+==================================================
+{% extends 'pages/base.html' %}
+
+{% block content %}
+    <h2>Iniciar Sesión</h2>
+    <p>Ingresa tus credenciales para acceder a tu cuenta.</p>
+    
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Entrar</button>
+    </form>
+    
+    <p style="margin-top: 20px;">¿No tienes cuenta? <a href="{% url 'registro' %}">Regístrate aquí</a>.</p>
+{% endblock %}
+
+==================================================
+ARCHIVO: ./accounts/templates/accounts/cambiar_password.html
+==================================================
+{% extends 'pages/base.html' %}
+
+{% block content %}
+    <h2>Cambiar Contraseña</h2>
+    <p>Por favor, ingresa tu contraseña antigua por seguridad, y luego tu nueva contraseña dos veces para confirmarla.</p>
+    
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Cambiar Contraseña</button>
+        <a href="{% url 'perfil' %}" class="btn btn-danger" style="text-decoration: none;">Cancelar</a>
+    </form>
+{% endblock %}
+
+==================================================
+ARCHIVO: ./accounts/templates/accounts/password_exito.html
+==================================================
+{% extends 'pages/base.html' %}
+
+{% block content %}
+    <h2>¡Contraseña Actualizada!</h2>
+    <p style="color: green; font-weight: bold;">Tu contraseña ha sido cambiada exitosamente.</p>
+    
+    <p>Por medidas de seguridad, tu sesión podría haberse cerrado en otros dispositivos.</p>
+    
+    <br>
+    <a href="{% url 'perfil' %}" class="btn">Volver a Mi Perfil</a>
+{% endblock %}
+
+==================================================
+ARCHIVO: ./accounts/templates/accounts/perfil.html
+==================================================
+{% extends 'pages/base.html' %}
+
+{% block content %}
+    <h2>Mi Perfil</h2>
+    
+    <div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 20px;">
+        <div>
+            {% if user.perfil.avatar %}
+                <img src="{{ user.perfil.avatar.url }}" alt="Avatar" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid #2c3e50;">
+            {% else %}
+                <div style="width: 150px; height: 150px; border-radius: 50%; background-color: #bdc3c7; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px;">
+                    Sin Foto
+                </div>
+            {% endif %}
+        </div>
+
+        <div>
+            <h3>{{ user.username }}</h3>
+            <p><strong>Nombre:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            
+            <h4 style="margin-top: 15px; border-bottom: 1px solid #eee;">Biografía</h4>
+            <p>{{ user.perfil.biografia|default:"Aún no has escrito una biografía." }}</p>
+            
+            {% if user.perfil.enlace %}
+                <p><strong>Enlace:</strong> <a href="{{ user.perfil.enlace }}" target="_blank">{{ user.perfil.enlace }}</a></p>
+            {% endif %}
+            
+            <br>
+            <a href="{% url 'editar_perfil' %}" class="btn">Editar Perfil</a>
+            <a href="{% url 'cambiar_password' %}" class="btn">Cambiar Contraseña</a>
+        </div>
+    </div>
+{% endblock %}
+
+==================================================
+ARCHIVO: ./static/.DS_Store
+==================================================
+[Archivo no legible como texto plano]
+
+==================================================
+ARCHIVO: ./pages/.DS_Store
+==================================================
+[Archivo no legible como texto plano]
+
+==================================================
+ARCHIVO: ./pages/models.py
+==================================================
+from django.db import models
+from django.contrib.auth.models import User
+from ckeditor.fields import RichTextField
+
+class Post(models.Model):
+
+    titulo = models.CharField(max_length=200)
+    subtitulo = models.CharField(max_length=200)
+    cuerpo = RichTextField()
+    fecha = models.DateField(auto_now_add=True)
+    imagen = models.ImageField(upload_to='posts_images/', null=True, blank=True)
+    
+    # Relación: Un autor (usuario) puede tener muchos posts (Foreign Key)
+    autor = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.titulo} - {self.autor.username}"
+
+==================================================
+ARCHIVO: ./pages/__init__.py
+==================================================
+
+
+==================================================
+ARCHIVO: ./pages/apps.py
+==================================================
+from django.apps import AppConfig
+
+
+class PagesConfig(AppConfig):
+    name = 'pages'
+
+
+==================================================
+ARCHIVO: ./pages/admin.py
+==================================================
+from django.contrib import admin
+from .models import Post
+
+admin.site.register(Post)
+
+==================================================
+ARCHIVO: ./pages/tests.py
+==================================================
+from django.test import TestCase
+
+# Create your tests here.
+
+
+==================================================
+ARCHIVO: ./pages/urls.py
+==================================================
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.home, name='home'),
+    path('about/', views.about, name='about'),
+    path('pages/', views.PostListView.as_view(), name='post_list'),
+    path('pages/<int:pk>/', views.PostDetailView.as_view(), name='post_detail'),
+    path('pages/nuevo/', views.PostCreateView.as_view(), name='post_create'),
+    path('pages/editar/<int:pk>/', views.PostUpdateView.as_view(), name='post_update'),
+    path('pages/borrar/<int:pk>/', views.PostDeleteView.as_view(), name='post_delete'),
+]
+
+==================================================
+ARCHIVO: ./pages/views.py
+==================================================
+from django.shortcuts import render
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import Post
+
+# --- Vistas Clásicas (Funciones) ---
+
+def home(request):
+    return render(request, 'pages/home.html')
+
+def about(request):
+    return render(request, 'pages/about.html')
+
+# --- Vistas Basadas en Clases (CBV) ---
+
+class PostListView(ListView):
+    model = Post
+    template_name = 'pages/post_list.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        if query:
+            return Post.objects.filter(titulo__icontains=query)
+        return Post.objects.all()
+
+class PostDetailView(DetailView):
+    model = Post
+    template_name = 'pages/post_detail.html'
+
+class PostCreateView(LoginRequiredMixin, CreateView):
+    model = Post
+    template_name = 'pages/post_form.html'
+    fields = ['titulo', 'subtitulo', 'cuerpo', 'imagen']
+    success_url = reverse_lazy('post_list')
+
+
+    def form_valid(self, form):
+        form.instance.autor = self.request.user
+        return super().form_valid(form)
+
+class PostUpdateView(LoginRequiredMixin, UpdateView):
+    model = Post
+    template_name = 'pages/post_form.html'
+    fields = ['titulo', 'subtitulo', 'cuerpo', 'imagen']
+    success_url = reverse_lazy('post_list')
+
+class PostDeleteView(LoginRequiredMixin, DeleteView):
+    model = Post
+    template_name = 'pages/post_confirm_delete.html'
+    success_url = reverse_lazy('post_list')
+
+==================================================
+ARCHIVO: ./pages/migrations/.DS_Store
+==================================================
+[Archivo no legible como texto plano]
+
+==================================================
+ARCHIVO: ./pages/migrations/__init__.py
+==================================================
+
+
+==================================================
+ARCHIVO: ./pages/migrations/0001_initial.py
+==================================================
+# Generated by Django 6.0.4 on 2026-05-29 17:53
+
+import ckeditor.fields
+import django.db.models.deletion
+from django.conf import settings
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    initial = True
+
+    dependencies = [
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name='Post',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('titulo', models.CharField(max_length=200)),
+                ('subtitulo', models.CharField(max_length=200)),
+                ('cuerpo', ckeditor.fields.RichTextField()),
+                ('fecha', models.DateField(auto_now_add=True)),
+                ('imagen', models.ImageField(blank=True, null=True, upload_to='posts_images/')),
+                ('autor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+            ],
+        ),
+    ]
+
+
+==================================================
+ARCHIVO: ./pages/templates/.DS_Store
+==================================================
+[Archivo no legible como texto plano]
+
+==================================================
+ARCHIVO: ./pages/templates/pages/post_confirm_delete.html
+==================================================
+{% extends 'pages/base.html' %}
+
+{% block content %}
+    <h2>Confirmar Eliminación</h2>
+    <p>¿Estás seguro de que deseas borrar la página: <strong>"{{ post.titulo }}"</strong>?</p>
+    
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Sí, borrar</button>
+        <a href="{% url 'post_list' %}" class="btn">Cancelar</a>
+    </form>
+{% endblock %}
+
+==================================================
+ARCHIVO: ./pages/templates/pages/home.html
+==================================================
+{% extends 'pages/base.html' %}
+
+{% block content %}
+    <h2>Bienvenido a mi Blog</h2>
+    <p>Este es el proyecto final para el curso de Python en CoderHouse.</p>
+    <a href="{% url 'post_list' %}" class="btn">Explorar Artículos</a>
+{% endblock %}
+
+==================================================
+ARCHIVO: ./pages/templates/pages/about.html
+==================================================
+{% extends 'pages/base.html' %}
+
+{% block content %}
+    <h2>Acerca de mí</h2>
+    <p>Hola, soy Diego. Desarrollador especializado en automatización, IA y ahora explorando el desarrollo web con Django.</p>
+{% endblock %}
+
+==================================================
+ARCHIVO: ./pages/templates/pages/base.html
+==================================================
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Literario DAVS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: rgb(236, 182, 42);
+            --primary-hover: rgb(33, 31, 31);
+            --dark: rgb(33, 31, 31);
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #334155;
+            --border: #e2e8f0;
+            --accent: #f59e0b; /* Color para destacar usuario autenticado */
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            background-color: var(--bg); 
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; 
+        }
+
+        /* HEADER & NAV */
+        header { 
+            background-color: var(--dark); 
+            color: white; 
+            padding: 1.5rem; 
+            text-align: center; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header-logo { height: 45px; width: auto; }
+        header h1 { margin: 0; font-size: 28px; font-family: 'Merriweather', serif; letter-spacing: -0.5px; }
+
+        nav { 
+            background-color: var(--surface); 
+            padding: 1rem; 
+            text-align: center; 
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        nav a { 
+            color: var(--text); 
+            text-decoration: none; 
+            font-weight: 500; 
+            transition: color 0.3s ease;
+            font-size: 15px;
+        }
+
+        nav a:hover { color: var(--primary); }
+        
+        .auth-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-left: 20px;
+            padding-left: 20px;
+            border-left: 1px solid var(--border);
+        }
+
+        .user-greeting { color: var(--accent); font-weight: 600; }
+
+        /* MAIN CONTENT */
+        main { 
+            flex: 1;
+            padding: 40px; 
+            max-width: 900px; 
+            width: 100%;
+            box-sizing: border-box;
+            margin: 40px auto; 
+            background: var(--surface); 
+            border-radius: 12px; 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); 
+            border: 1px solid var(--border);
+        }
+
+        h2 { margin-top: 0; color: var(--dark); font-weight: 700; font-family: 'Merriweather', serif; }
+
+        /* BOTONES */
+        .btn { 
+            background-color: var(--primary); 
+            color: white; 
+            padding: 10px 18px; 
+            text-decoration: none; 
+            border-radius: 6px; 
+            display: inline-block; 
+            border: none; 
+            cursor: pointer; 
+            font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover { background-color: var(--primary-hover); }
+        .btn-danger { background-color: #ef4444; }
+        .btn-danger:hover { background-color: #dc2626; }
+        
+        button.btn-link {
+            background: none; border: none; color: #ef4444; cursor: pointer; font-weight: 600; font-size: 15px; padding: 0;
+        }
+        button.btn-link:hover { color: #dc2626; text-decoration: underline; }
+
+        /* POST CARDS */
+        .post-card { 
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px; 
+            margin-bottom: 20px; 
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .post-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        /* FORMULARIOS */
+        input[type="text"], input[type="email"], input[type="password"], textarea, select {
+            width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px;
+            border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box;
+        }
+
+        img { max-width: 100%; height: auto; border-radius: 8px; }
+
+        /* FOOTER */
+        .main-footer {
+            background-color: var(--dark);
+            color: #94a3b8;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .footer-left, .footer-right { flex: 1; }
+        .footer-right { text-align: right; }
+        .footer-center { flex: 1; display: flex; justify-content: center; }
+        .footer-logo img { height: 35px; width: auto; opacity: 0.9; transition: opacity 0.3s ease; }
+        .footer-logo img:hover { opacity: 1; }
+
+        @media (max-width: 768px) {
+            .main-footer { flex-direction: column; gap: 15px; text-align: center; }
+            .footer-left, .footer-right { text-align: center; }
+            .auth-section { border-left: none; margin-left: 0; padding-left: 0; width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="{% static 'img/DAVS_blog_articulos_literarios_logo.png' %}" alt="Icono Literario" class="header-logo">
+        <h1>Portal Literario</h1>
+    </header>
+    
+    <nav>
+        <a href="{% url 'home' %}">Inicio</a>
+        <a href="{% url 'about' %}">Acerca de mí</a>
+        <a href="{% url 'post_list' %}">Blog</a>
+        
+        <div class="auth-section">
+            {% if user.is_authenticated %}
+                <span class="user-greeting">Hola, {{ user.username }}</span>
+                <a href="{% url 'bandeja_entrada' %}">Mensajes</a> 
+                <a href="{% url 'perfil' %}">Mi Perfil</a>
+                <form action="{% url 'logout' %}" method="post" style="display: inline; margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-link">Salir</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}">Iniciar Sesión</a>
+                <a href="{% url 'registro' %}" class="btn" style="color: white;">Registrarse</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main>
+        {% if messages %}
+            {% for message in messages %}
+                <div style="background-color: #d1fae5; color: #065f46; padding: 12px; border-radius: 6px; margin-bottom: 20px; text-align: center; border: 1px solid #a7f3d0;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-left">
+            Desarrollado por: Diego Videla Silva
+        </div>
+        <div class="footer-center footer-logo">
+            <img src="{% static 'img/logo.png' %}" alt="Logo Diego Videla Silva">
+        </div>
+        <div class="footer-right">
+            © 2026. Todos los derechos reservados.
+        </div>
+    </footer>
+</body>
+</html>
+
+==================================================
+ARCHIVO: ./pages/templates/pages/post_form.html
+==================================================
+{% extends 'pages/base.html' %}
+
+{% block content %}
+    <h2>{% if object %}Editar Página{% else %}Crear Nueva Página{% endif %}</h2>
+    
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.media }} {{ form.as_p }}
+        <button type="submit" class="btn">Guardar</button>
+        <a href="{% url 'post_list' %}" class="btn btn-danger" style="text-decoration: none;">Cancelar</a>
+    </form>
+{% endblock %}
+
+==================================================
+ARCHIVO: ./pages/templates/pages/post_list.html
+==================================================
+{% extends 'pages/base.html' %}
+
+{% block content %}
+    <h2>Páginas Publicadas</h2>
+    
+    <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+        <a href="{% url 'post_create' %}" class="btn">➕ Crear Nueva Página</a>
+        
+        <form method="GET" style="display: flex; gap: 10px;">
+            <input type="text" name="q" placeholder="Buscar por título..." value="{{ request.GET.q }}" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; min-width: 250px;">
+            <button type="submit" class="btn">🔍 Buscar</button>
+            
+            {% if request.GET.q %}
+                <a href="{% url 'post_list' %}" class="btn btn-danger" style="text-decoration: none;">Limpiar</a>
+            {% endif %}
+        </form>
+    </div>
+
+    {% if posts %}
+        {% for post in posts %}
+            <div class="post-card">
+                <h3>{{ post.titulo }}</h3>
+                <p><em>{{ post.subtitulo }}</em> - Autor: {{ post.autor.username }} | {{ post.fecha }}</p>
+                <a href="{% url 'post_detail' post.pk %}" class="btn">Leer más</a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p style="color: #e74c3c; font-weight: bold; font-size: 1.1em;">
+            {% if request.GET.q %}
+                No se encontraron páginas que coincidan con la búsqueda "{{ request.GET.q }}".
+            {% else %}
+                No hay páginas aún.
+            {% endif %}
+        </p>
+    {% endif %}
+{% endblock %}
+
+==================================================
+ARCHIVO: ./pages/templates/pages/post_detail.html
+==================================================
+{% extends 'pages/base.html' %}
+
+{% block content %}
+    <h2>{{ post.titulo }}</h2>
+    <h4 style="color: gray;">{{ post.subtitulo }}</h4>
+    <p><small>Por {{ post.autor.username }} el {{ post.fecha }}</small></p>
+
+    {% if post.imagen %}
+        <img src="{{ post.imagen.url }}" alt="Imagen de {{ post.titulo }}">
+    {% endif %}
+
+    <div style="margin-top: 20px;">
+        {{ post.cuerpo|safe }}
+    </div>
+
+    <hr style="margin: 30px 0;">
+    
+    <a href="{% url 'post_list' %}" class="btn">Volver</a>
+    <a href="{% url 'post_update' post.pk %}" class="btn">Editar</a>
+    <a href="{% url 'post_delete' post.pk %}" class="btn btn-danger">Borrar</a>
+{% endblock %}
+
+==================================================
+ARCHIVO: ./messaging/.DS_Store
+==================================================
+[Archivo no legible como texto plano]
+
+==================================================
+ARCHIVO: ./messaging/models.py
+==================================================
+from django.db import models
+from django.contrib.auth.models import User
+
+class Mensaje(models.Model):
+    remitente = models.ForeignKey(User, related_name='mensajes_enviados', on_delete=models.CASCADE)
+    destinatario = models.ForeignKey(User, related_name='mensajes_recibidos', on_delete=models.CASCADE)
+    asunto = models.CharField(max_length=100)
+    cuerpo = models.TextField()
+    fecha_envio = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"De: {self.remitente.username} a {self.destinatario.username} | Asunto: {self.asunto}"
+
+==================================================
+ARCHIVO: ./messaging/__init__.py
+==================================================
+
+
+==================================================
+ARCHIVO: ./messaging/apps.py
+==================================================
+from django.apps import AppConfig
+
+
+class MessagingConfig(AppConfig):
+    name = 'messaging'
+
+
+==================================================
+ARCHIVO: ./messaging/forms.py
+==================================================
+from django import forms
+from .models import Mensaje
+from django.contrib.auth.models import User
+
+class MensajeForm(forms.ModelForm):
+    class Meta:
+        model = Mensaje
+        fields = ['destinatario', 'asunto', 'cuerpo']
+        
+    def __init__(self, *args, **kwargs):
+
+        usuario_actual = kwargs.pop('usuario_actual', None)
+        super(MensajeForm, self).__init__(*args, **kwargs)
+        if usuario_actual:
+            self.fields['destinatario'].queryset = User.objects.exclude(id=usuario_actual.id)
+
+==================================================
+ARCHIVO: ./messaging/admin.py
+==================================================
+from django.contrib import admin
+
+# Register your models here.
+
+
+==================================================
+ARCHIVO: ./messaging/tests.py
+==================================================
+from django.test import TestCase
+
+# Create your tests here.
+
+
+==================================================
+ARCHIVO: ./messaging/urls.py
+==================================================
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.bandeja_entrada, name='bandeja_entrada'),
+    path('enviar/', views.enviar_mensaje, name='enviar_mensaje'),
+    path('leer/<int:pk>/', views.leer_mensaje, name='leer_mensaje'),
+]
+
+==================================================
+ARCHIVO: ./messaging/views.py
+==================================================
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Mensaje
+from .forms import MensajeForm
+
+# Bandeja de entrada (mensajes recibidos)
+@login_required
+def bandeja_entrada(request):
+    mensajes = Mensaje.objects.filter(destinatario=request.user).order_by('-fecha_envio')
+    return render(request, 'messaging/bandeja_entrada.html', {'mensajes': mensajes})
+
+# Enviar un nuevo mensaje
+@login_required
+def enviar_mensaje(request):
+    if request.method == 'POST':
+        form = MensajeForm(request.POST, usuario_actual=request.user)
+        if form.is_valid():
+            mensaje = form.save(commit=False)
+            mensaje.remitente = request.user 
+            mensaje.save()
+            return redirect('bandeja_entrada')
+    else:
+        form = MensajeForm(usuario_actual=request.user)
+        
+    return render(request, 'messaging/enviar_mensaje.html', {'form': form})
+
+# Leer un mensaje en detalle
+@login_required
+def leer_mensaje(request, pk):
+    mensaje = get_object_or_404(Mensaje, pk=pk, destinatario=request.user)
+    return render(request, 'messaging/leer_mensaje.html', {'mensaje': mensaje})
+
+==================================================
+ARCHIVO: ./messaging/migrations/.DS_Store
+==================================================
+[Archivo no legible como texto plano]
+
+==================================================
+ARCHIVO: ./messaging/migrations/__init__.py
+==================================================
+
+
+==================================================
+ARCHIVO: ./messaging/migrations/0001_initial.py
+==================================================
+# Generated by Django 6.0.4 on 2026-05-29 17:54
+
+import django.db.models.deletion
+from django.conf import settings
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    initial = True
+
+    dependencies = [
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name='Mensaje',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('asunto', models.CharField(max_length=100)),
+                ('cuerpo', models.TextField()),
+                ('fecha_envio', models.DateTimeField(auto_now_add=True)),
+                ('destinatario', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='mensajes_recibidos', to=settings.AUTH_USER_MODEL)),
+                ('remitente', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='mensajes_enviados', to=settings.AUTH_USER_MODEL)),
+            ],
+        ),
+    ]
+
+
+==================================================
+ARCHIVO: ./messaging/templates/messaging/bandeja_entrada.html
+==================================================
+{% extends 'pages/base.html' %}
+
+{% block content %}
+    <h2>Bandeja de Entrada</h2>
+    
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'enviar_mensaje' %}" class="btn">Redactar Nuevo Mensaje</a>
+    </div>
+
+    {% if mensajes %}
+        {% for mensaje in mensajes %}
+            <div class="post-card" style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #3498db; border-radius: 5px;">
+                <h3 style="margin-top: 0;">{{ mensaje.asunto }}</h3>
+                <p style="margin: 5px 0;"><strong>De:</strong> {{ mensaje.remitente.username }}</p>
+                <p style="font-size: 0.9em; color: gray;"><strong>Fecha:</strong> {{ mensaje.fecha_envio|date:"d M Y H:i" }}</p>
+                <a href="{% url 'leer_mensaje' mensaje.pk %}" class="btn" style="margin-top: 10px;">Leer Mensaje</a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p style="color: #7f8c8d; font-style: italic;">No tienes mensajes en tu bandeja de entrada en este momento.</p>
+    {% endif %}
+{% endblock %}
+
+==================================================
+ARCHIVO: ./messaging/templates/messaging/leer_mensaje.html
+==================================================
+{% extends 'pages/base.html' %}
+
+{% block content %}
+    <h2>Asunto: {{ mensaje.asunto }}</h2>
+    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">
+        <span style="color: gray;"><strong>De:</strong> {{ mensaje.remitente.username }}</span>
+        <span style="color: gray;"><strong>Fecha:</strong> {{ mensaje.fecha_envio|date:"d M Y H:i" }}</span>
+    </div>
+
+    <div style="background-color: #f1f2f6; padding: 20px; border-radius: 5px; min-height: 100px; font-size: 1.1em;">
+        {{ mensaje.cuerpo|linebreaks }}
+    </div>
+
+    <br>
+    <a href="{% url 'bandeja_entrada' %}" class="btn">Volver a la bandeja</a>
+{% endblock %}
+
+==================================================
+ARCHIVO: ./messaging/templates/messaging/enviar_mensaje.html
+==================================================
+{% extends 'pages/base.html' %}
+
+{% block content %}
+    <h2>Enviar Mensaje Directo</h2>
+    <p>Selecciona a un usuario de la plataforma y escríbele un mensaje.</p>
+    
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Enviar</button>
+        <a href="{% url 'bandeja_entrada' %}" class="btn btn-danger" style="text-decoration: none;">Cancelar</a>
+    </form>
+{% endblock %}

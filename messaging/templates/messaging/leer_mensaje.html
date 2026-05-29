@@ -1,0 +1,16 @@
+{% extends 'pages/base.html' %}
+
+{% block content %}
+    <h2>Asunto: {{ mensaje.asunto }}</h2>
+    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">
+        <span style="color: gray;"><strong>De:</strong> {{ mensaje.remitente.username }}</span>
+        <span style="color: gray;"><strong>Fecha:</strong> {{ mensaje.fecha_envio|date:"d M Y H:i" }}</span>
+    </div>
+
+    <div style="background-color: #f1f2f6; padding: 20px; border-radius: 5px; min-height: 100px; font-size: 1.1em;">
+        {{ mensaje.cuerpo|linebreaks }}
+    </div>
+
+    <br>
+    <a href="{% url 'bandeja_entrada' %}" class="btn">Volver a la bandeja</a>
+{% endblock %}

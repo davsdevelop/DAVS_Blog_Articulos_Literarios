@@ -1,0 +1,12 @@
+{% extends 'pages/base.html' %}
+
+{% block content %}
+    <h2>{% if object %}Editar Página{% else %}Crear Nueva Página{% endif %}</h2>
+    
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.media }} {{ form.as_p }}
+        <button type="submit" class="btn">Guardar</button>
+        <a href="{% url 'post_list' %}" class="btn btn-danger" style="text-decoration: none;">Cancelar</a>
+    </form>
+{% endblock %}

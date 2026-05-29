@@ -1,0 +1,21 @@
+{% extends 'pages/base.html' %}
+
+{% block content %}
+    <h2>{{ post.titulo }}</h2>
+    <h4 style="color: gray;">{{ post.subtitulo }}</h4>
+    <p><small>Por {{ post.autor.username }} el {{ post.fecha }}</small></p>
+
+    {% if post.imagen %}
+        <img src="{{ post.imagen.url }}" alt="Imagen de {{ post.titulo }}">
+    {% endif %}
+
+    <div style="margin-top: 20px;">
+        {{ post.cuerpo|safe }}
+    </div>
+
+    <hr style="margin: 30px 0;">
+    
+    <a href="{% url 'post_list' %}" class="btn">Volver</a>
+    <a href="{% url 'post_update' post.pk %}" class="btn">Editar</a>
+    <a href="{% url 'post_delete' post.pk %}" class="btn btn-danger">Borrar</a>
+{% endblock %}
